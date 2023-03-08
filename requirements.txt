@@ -1,0 +1,9 @@
+cjio[export,reproject,validate]
+itkwidgets
+matplotlib
+numpy
+pandas
+pyvista
+scikit-learn
+shapely
+trame
