@@ -1,0 +1,47 @@
+vars:
+- data_root: citydata
+
+stages:
+  convert_to_cityjson:
+    foreach:
+    - Charlottenburg-Wilmersdorf
+    - Friedrichshain-Kreuzberg
+    - Lichtenberg
+    - Marzahn-Hellersdorf
+    - Mitte
+    - Neukoelln
+    - Pankow
+    - Reinickendorf
+    - Spandau
+    - Steglitz-Zehlendorf
+    - Tempelhof-Schoeneberg
+    - Treptow-Koepenick
+    do:
+      cmd: convert.sh ${data_root}/berlin/citygml/${item}/citygml.gml
+      deps:
+      - convert.sh
+      - ${data_root}/berlin/citygml/${item}/citygml.gml
+      outs:
+      - ${data_root}/berlin/citygml/${item}/citygml.json
+  extract_objs:
+    foreach:
+    - Charlottenburg-Wilmersdorf
+    - Friedrichshain-Kreuzberg
+    - Lichtenberg
+    - Marzahn-Hellersdorf
+    - Mitte
+    - Neukoelln
+    - Pankow
+    - Reinickendorf
+    - Spandau
+    - Steglitz-Zehlendorf
+    - Tempelhof-Schoeneberg
+    - Treptow-Koepenick
+    do:
+      cmd: python extract_obj.py ${data_root}/berlin/citygml/${item}/citygml.json ${data_root}/berlin/meshes/${item}
+      deps:
+      - extract_obj.py
+      - ${data_root}/berlin/citygml/${item}/citygml.json
+      - ${data_root}/berlin/citygml/${item}/appearance
+      outs:
+      - ${data_root}/berlin/meshes/${item}
