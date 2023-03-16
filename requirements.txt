@@ -7,3 +7,4 @@ pyvista
 scikit-learn
 shapely
 trame
+tqdm
