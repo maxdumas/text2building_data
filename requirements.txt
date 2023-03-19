@@ -5,6 +5,7 @@ numpy
 pandas
 pyvista
 scikit-learn
-shapely
 trame
 tqdm
+trimesh
+pyrender
