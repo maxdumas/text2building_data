@@ -10,4 +10,5 @@ tqdm
 trimesh
 pyrender
 easyprocess
-
+pyembree
+dvc

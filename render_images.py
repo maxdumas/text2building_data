@@ -9,21 +9,22 @@ import trimesh
 from PIL import Image
 from tqdm.auto import tqdm
 
-os.environ['PYOPENGL_PLATFORM'] = 'egl'
+os.environ["PYOPENGL_PLATFORM"] = "egl"
+
 
 def rotate_y(angle):
     c = np.cos(angle)
     s = np.sin(angle)
-    rotation_matrix = np.array(
-        [[c, 0, s], [0, 1, 0], [-s, 0, c]]
-    )
+    rotation_matrix = np.array([[c, 0, s], [0, 1, 0], [-s, 0, c]])
     return rotation_matrix
+
 
 def fit_view_to_bbox(xfov, obj_bbox):
     padding = 0.4
     max_dim = np.max(obj_bbox[1] - obj_bbox[0]) + padding
     dist = max_dim / (2 * np.tan(xfov)) + max_dim / 2
     return np.array([0, 0, dist])
+
 
 def look_at(camera_pos, target_pos):
     camera_z = (camera_pos - target_pos) / np.linalg.norm(camera_pos - target_pos)
@@ -36,6 +37,7 @@ def look_at(camera_pos, target_pos):
     camera_pose[:3, 2] = camera_z
     camera_pose[:3, 3] = camera_pos
     return camera_pose
+
 
 class ImageRenderer(cli.Application):
     output_width = cli.SwitchAttr("output_width", int, default=512)
@@ -53,37 +55,58 @@ class ImageRenderer(cli.Application):
 
         for i, angle in enumerate(np.linspace(0, 2 * np.pi, 12, endpoint=False)):
             # Prepare lighting and camera
-            camera_pos = (fit_view_to_bbox(camera_xfov, scene.bounds) * rotate_y(angle))[:, 2]
+            camera_pos = (
+                fit_view_to_bbox(camera_xfov, scene.bounds) * rotate_y(angle)
+            )[:, 2]
             camera_pose = look_at(camera_pos, np.array([0, 0, 0]))
             pyr_scene.main_camera_node = pyr_scene.add(
-                pyrender.PerspectiveCamera(yfov=self.camera_yfov, aspectRatio=camera_aspect_ratio),
+                pyrender.PerspectiveCamera(
+                    yfov=self.camera_yfov, aspectRatio=camera_aspect_ratio
+                ),
                 pose=camera_pose,
             )
-            light = pyr_scene.add(pyrender.DirectionalLight(color=[1.0, 1.0, 1.0], intensity=2.0), pose=camera_pose)
+            light = pyr_scene.add(
+                pyrender.DirectionalLight(color=[1.0, 1.0, 1.0], intensity=2.0),
+                pose=camera_pose,
+            )
 
-            color, _ = self.r.render(pyr_scene, flags=pyrender.RenderFlags.SHADOWS_DIRECTIONAL)
-            
+            color, _ = self.r.render(
+                pyr_scene, flags=pyrender.RenderFlags.SHADOWS_DIRECTIONAL
+            )
+
             # Clean up scene for next rendering pass
             pyr_scene.remove_node(pyr_scene.main_camera_node)
             pyr_scene.remove_node(light)
 
             yield Image.fromarray(color), i
-            
-    
-    def main(self, input_mesh_dir: cli.ExistingDirectory, output_image_dir: cli.ExistingDirectory):
+
+    def main(
+        self,
+        input_mesh_dir: cli.ExistingDirectory,
+        output_image_dir: cli.switches.MakeDirectory,
+    ):
         files = glob.glob(os.path.join(input_mesh_dir, "*.obj"))
 
-        self.r = pyrender.OffscreenRenderer(viewport_width=self.output_width, viewport_height=self.output_width, point_size=1.0)
+        self.r = pyrender.OffscreenRenderer(
+            viewport_width=self.output_width,
+            viewport_height=self.output_width,
+            point_size=1.0,
+        )
 
         for f in tqdm(files):
-            if os.path.exists(os.path.join(output_image_dir, f"{os.path.basename(f)}_0.png")):
+            if os.path.exists(
+                os.path.join(output_image_dir, f"{os.path.basename(f)}_0.png")
+            ):
                 continue
             for im, i in self.render_scene(f):
-                im.save(os.path.join(output_image_dir, f"{os.path.basename(f)}_{i}.png"))
+                im.save(
+                    os.path.join(output_image_dir, f"{os.path.basename(f)}_{i}.png")
+                )
 
     def cleanup(self, retcode):
         self.r.delete()
         return super().cleanup(retcode)
+
 
 if __name__ == "__main__":
     ImageRenderer.run()

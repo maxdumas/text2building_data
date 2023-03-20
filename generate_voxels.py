@@ -52,7 +52,7 @@ class Voxelizer(cli.Application):
     def main(
         self,
         input_mesh_dir: cli.ExistingDirectory,
-        output_voxels_dir: cli.ExistingDirectory,
+        output_voxels_dir: cli.switches.MakeDirectory,
     ):
         files = glob.glob(os.path.join(input_mesh_dir, "*.obj"))
 
