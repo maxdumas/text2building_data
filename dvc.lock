@@ -1,0 +1,17 @@
+schema: '2.0'
+stages:
+  close_meshes:
+    cmd: python close_meshes.py citydata/buildingnet/meshes citydata/buildingnet/meshes_closed
+    deps:
+    - path: citydata/buildingnet/meshes
+      md5: 2903bc426bf9b8679809622a33f19c60.dir
+      size: 26451186676
+      nfiles: 85745
+    - path: close_meshes.py
+      md5: 72cf4f4a6931d08b9517d150479d44da
+      size: 1613
+    outs:
+    - path: citydata/buildingnet/meshes_closed
+      md5: deea9173663f27acd8edb4fb89a5ffc4.dir
+      size: 28618670127
+      nfiles: 1938

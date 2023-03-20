@@ -13,7 +13,7 @@ stages:
     cmd: python close_meshes.py ${buildingnet_root}/meshes ${buildingnet_root}/meshes_closed
     deps:
     - close_meshes.py
-    - bin/manifold
+    - ${buildingnet_root}/meshes
     outs:
     - ${buildingnet_root}/meshes_closed
   generate_voxels:
