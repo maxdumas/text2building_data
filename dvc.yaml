@@ -1,47 +1,33 @@
 vars:
-- data_root: citydata
+- buildingnet_root: citydata/buildingnet
 
 stages:
-  convert_to_cityjson:
-    foreach:
-    - Charlottenburg-Wilmersdorf
-    - Friedrichshain-Kreuzberg
-    - Lichtenberg
-    - Marzahn-Hellersdorf
-    - Mitte
-    - Neukoelln
-    - Pankow
-    - Reinickendorf
-    - Spandau
-    - Steglitz-Zehlendorf
-    - Tempelhof-Schoeneberg
-    - Treptow-Koepenick
-    do:
-      cmd: convert.sh ${data_root}/berlin/citygml/${item}/citygml.gml
-      deps:
-      - convert.sh
-      - ${data_root}/berlin/citygml/${item}/citygml.gml
-      outs:
-      - ${data_root}/berlin/citygml/${item}/citygml.json
-  extract_objs:
-    foreach:
-    - Charlottenburg-Wilmersdorf
-    - Friedrichshain-Kreuzberg
-    - Lichtenberg
-    - Marzahn-Hellersdorf
-    - Mitte
-    - Neukoelln
-    - Pankow
-    - Reinickendorf
-    - Spandau
-    - Steglitz-Zehlendorf
-    - Tempelhof-Schoeneberg
-    - Treptow-Koepenick
-    do:
-      cmd: python extract_obj.py ${data_root}/berlin/citygml/${item}/citygml.json ${data_root}/berlin/meshes/${item}
-      deps:
-      - extract_obj.py
-      - ${data_root}/berlin/citygml/${item}/citygml.json
-      - ${data_root}/berlin/citygml/${item}/appearance
-      outs:
-      - ${data_root}/berlin/meshes/${item}
+  render_images:
+    cmd: python render_images.py ${buildingnet_root}/meshes ${buildingnet_root}/images
+    deps:
+    - render_images.py
+    - ${buildingnet_root}/meshes
+    outs:
+    - ${buildingnet_root}/images
+  close_meshes:
+    cmd: python close_meshes.py ${buildingnet_root}/meshes ${buildingnet_root}/meshes_closed
+    deps:
+    - close_meshes.py # TODO: Create this file using bin/manifold
+    - bin/manifold
+    outs:
+    - ${buildingnet_root}/meshes_closed
+  generate_voxels:
+    cmd: python generate_voxels.py ${buildingnet_root}/meshes_closed ${buildingnet_root}/voxels
+    deps:
+    - generate_voxels.py
+    - ${buildingnet_root}/meshes_closed
+    outs:
+    - ${buildingnet_root}/voxels
+  generate_occupancy_points:
+    cmd: python generate_occupancy_points.py ${buildingnet_root}/meshes_closed ${buildingnet_root}/occpancy_points
+    deps:
+    - generate_occupancy_points.py # TODO: Create this file
+    - ${buildingnet_root}/meshes_closed
+    outs:
+    - ${buildingnet_root}/occpancy_points
+  

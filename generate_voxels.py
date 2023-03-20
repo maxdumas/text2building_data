@@ -7,8 +7,6 @@ from tqdm.contrib.concurrent import thread_map
 from tqdm.auto import tqdm
 from easyprocess import EasyProcess
 
-docker = local["docker"]
-
 
 class Voxelizer(cli.Application):
     voxel_resolution = cli.SwitchAttr("resolution", int, default=32)
