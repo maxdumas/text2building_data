@@ -9,3 +9,5 @@ trame
 tqdm
 trimesh
 pyrender
+easyprocess
+
