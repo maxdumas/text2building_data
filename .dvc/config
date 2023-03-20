@@ -1,5 +1,5 @@
 [core]
     remote = cornell-ut-aws
 ['remote "cornell-ut-aws"']
-    url = s3://cornell-mfd64/dvc/text2building_data
+    url = s3://cornell-mfd64/dvc/text2building_data_2
     version_aware = true
