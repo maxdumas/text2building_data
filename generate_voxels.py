@@ -23,10 +23,13 @@ class Voxelizer(cli.Application):
                 "--gpus",
                 "all",
                 "-v",
-                f"{os.getcwd()}/citydata:/citydata",
+                # N.B. We need to mount the volume preserving the exact
+                # directory structure of the caller, as DVC will be using
+                # symlinks.
+                f"{os.getcwd()}:{os.getcwd()}",
                 "cuda_voxelizer",
                 "-f",
-                f"/{os.path.relpath(input_path)}",
+                os.path.abspath(input_path),
                 "-s",
                 str(self.voxel_resolution),
                 "-o",

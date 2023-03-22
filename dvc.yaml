@@ -24,10 +24,10 @@ stages:
     outs:
     - ${buildingnet_root}/voxels
   generate_occupancy_points:
-    cmd: python generate_occupancy_points.py ${buildingnet_root}/meshes_closed ${buildingnet_root}/occpancy_points
+    cmd: python generate_occupancy_points.py --sampling_method voxelgrid_lookup ${buildingnet_root}/voxels ${buildingnet_root}/occupancy_points
     deps:
-    - generate_occupancy_points.py # TODO: Create this file
-    - ${buildingnet_root}/meshes_closed
+    - generate_occupancy_points.py
+    - ${buildingnet_root}/voxels
     outs:
-    - ${buildingnet_root}/occpancy_points
+    - ${buildingnet_root}/occupancy_points
   
