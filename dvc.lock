@@ -13616,3 +13616,19 @@ stages:
           cornell-ut-aws:
             etag: 727050a325ec2d2d6a1a6ccd9b1c93bc
             version_id: C7KpyHi9R2Tx5zJa94YLRn6DJ9Sg.5on
+  generate_occupancy_points:
+    cmd: python generate_occupancy_points.py --sampling_method voxelgrid_lookup citydata/buildingnet/voxels
+      citydata/buildingnet/occupancy_points
+    deps:
+    - path: citydata/buildingnet/voxels
+      md5: ac63c6b8570bfe4bafac754bfd38af5e.dir
+      size: 6899185
+      nfiles: 1939
+    - path: generate_occupancy_points.py
+      md5: 2d4d3e83457fff340c532b9bf82670fa
+      size: 3489
+    outs:
+    - path: citydata/buildingnet/occupancy_points
+      md5: 8fab33e6c798aae8d117afc81f93eb67.dir
+      size: 1028686392
+      nfiles: 1940
