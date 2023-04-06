@@ -1,5 +1,23 @@
 outs:
-- md5: 172ceaddc92807e9bd11b8536a2a2f37.dir
-  size: 98216
-  nfiles: 4
-  path: splits
+- path: splits
+  files:
+  - relpath: dataset_models.txt
+    md5: adca56e2d0c85d142a02e784674c792c
+    size: 49109
+    version_id: De1QphuoxVQ71gRMs4wMJ_RNADQ_CsdR
+    etag: adca56e2d0c85d142a02e784674c792c
+  - relpath: test_split.txt
+    md5: e70820ba027f60d8bcd8a74c752fac3e
+    size: 4817
+    version_id: 7moUnCKJ7xJfI5kRKnWjImJIS8dA4MkS
+    etag: e70820ba027f60d8bcd8a74c752fac3e
+  - relpath: train_split.txt
+    md5: 28e627e8759201e37570e510faf446d8
+    size: 39296
+    version_id: UCBAjU21nCeugcmcEQQ9ODUmyTxLGGaG
+    etag: 28e627e8759201e37570e510faf446d8
+  - relpath: val_split.txt
+    md5: 568ee18244f4582351e732fddb2fe0c3
+    size: 4994
+    version_id: QaBosHk54dPbzQ4s92ofpgOPAQz6zVqr
+    etag: 568ee18244f4582351e732fddb2fe0c3
