@@ -12,3 +12,4 @@ pyrender
 easyprocess
 pyembree
 dvc
+open3d
