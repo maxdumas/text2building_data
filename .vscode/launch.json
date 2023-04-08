@@ -11,6 +11,32 @@
             "program": "${file}",
             "console": "integratedTerminal",
             "justMyCode": false
+        },
+        {
+            "name": "Debug close_meshes.py",
+            "type": "python",
+            "request": "launch",
+            "program": "close_meshes.py",
+            "args": [
+                "citydata/buildingnet/meshes",
+                "citydata/buildingnet/meshes_closed",
+            ],
+            "console": "integratedTerminal",
+            "justMyCode": false
+        },
+        {
+            "name": "Profile close_meshes.py",
+            "type": "python",
+            "request": "launch",
+            "module": "cProfile",
+            "args": [
+                "-o", "/tmp/tmp2.prof",
+                "close_meshes.py",
+                "citydata/buildingnet/meshes",
+                "citydata/buildingnet/meshes_closed",
+            ],
+            "console": "integratedTerminal",
+            "justMyCode": false
         }
     ]
 }

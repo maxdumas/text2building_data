@@ -1,6 +1,8 @@
 import glob
+import gzip
 import os
 import shutil
+from tempfile import TemporaryDirectory
 
 from plumbum import cli, local
 from tqdm.contrib.concurrent import thread_map
@@ -15,40 +17,44 @@ class Voxelizer(cli.Application):
         input_path, output_path = args
         if os.path.exists(output_path):
             return output_path
+        
+        with TemporaryDirectory() as tmpdir:
+            # Decompress the file at input_path to a temporary location
+            decompressed_path = os.path.join(tmpdir, os.path.basename(input_path.replace(".obj.gz", ".obj")))
+            with gzip.open(input_path, "rb") as f:
+                with open(decompressed_path, "wb") as f2:
+                    f2.write(f.read())
+        
+            with EasyProcess(
+                [
+                    "docker",
+                    "run",
+                    # "--gpus",
+                    # "all",
+                    "-v",
+                    f"{tmpdir}:/inputs",
+                    "cuda_voxelizer",
+                    "-f",
+                    f"/inputs/{os.path.basename(decompressed_path)}",
+                    "-s",
+                    str(self.voxel_resolution),
+                    "-o",
+                    "binvox",
+                    "-thrust",
+                ]
+            ) as proc:
+                proc.wait()
+                if proc.return_code != 0:
+                    print(
+                        f"Failed to voxelize file {input_path}. cuda_voxelizer returned {proc.return_code} with the following error:\n{proc.stdout}"
+                    )
+                    return None
 
-        with EasyProcess(
-            [
-                "docker",
-                "run",
-                "--gpus",
-                "all",
-                "-v",
-                # N.B. We need to mount the volume preserving the exact
-                # directory structure of the caller, as DVC will be using
-                # symlinks.
-                f"{os.getcwd()}:{os.getcwd()}",
-                "cuda_voxelizer",
-                "-f",
-                os.path.abspath(input_path),
-                "-s",
-                str(self.voxel_resolution),
-                "-o",
-                "binvox",
-                "-thrust",
-            ]
-        ) as proc:
-            proc.wait()
-            if proc.return_code != 0:
-                print(
-                    f"Failed to voxelize file {input_path}. cuda_voxelizer returned {proc.return_code} with the following error:\n{proc.stdout}"
-                )
-                return None
-
-        # cuda_voxelizer does not allow us to specify where to put the generated
-        # cuda_voxelizer file. It puts it adjacent to the input OBJ, so we need
-        # to move it to the destination
-        voxelizer_output_path = input_path + "_32.binvox"
-        shutil.move(voxelizer_output_path, output_path)
+            # cuda_voxelizer does not allow us to specify where to put the generated
+            # cuda_voxelizer file. It puts it adjacent to the input OBJ, so we need
+            # to move it to the destination
+            voxelizer_output_path = decompressed_path + "_32.binvox"
+            shutil.move(voxelizer_output_path, output_path)
 
         return output_path
 
@@ -57,12 +63,12 @@ class Voxelizer(cli.Application):
         input_mesh_dir: cli.ExistingDirectory,
         output_voxels_dir: cli.switches.MakeDirectory,
     ):
-        files = glob.glob(os.path.join(input_mesh_dir, "*.obj"))
+        files = glob.glob(os.path.join(input_mesh_dir, "*.obj.gz"))
 
         def make_output_path(input_path):
             return os.path.join(
                 output_voxels_dir,
-                os.path.basename(input_path.replace(".obj", ".binvox")),
+                os.path.basename(input_path.replace(".obj.gz", ".binvox")),
             )
 
         for output_path in thread_map(
